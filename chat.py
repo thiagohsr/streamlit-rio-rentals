@@ -119,10 +119,16 @@ def send_chat_message(client, model, user_text):
         # the request) isn't raised as an error by the OpenAI SDK — it's
         # returned as a plain string instead. Treat it as a backend failure.
         snippet = str(response)[:200]
+        cf_id_seen = bool(os.environ.get("CF_ACCESS_CLIENT_ID"))
+        cf_secret_seen = bool(os.environ.get("CF_ACCESS_CLIENT_SECRET"))
         st.session_state["last_debug"] = {
             "reasoning": None,
             "tool_calls_raw": [],
-            "error": f"Backend returned a non-API response, likely blocked upstream: {snippet!r}",
+            "error": (
+                f"Backend returned a non-API response, likely blocked upstream "
+                f"(CF_ACCESS_CLIENT_ID set: {cf_id_seen}, CF_ACCESS_CLIENT_SECRET set: {cf_secret_seen}): "
+                f"{snippet!r}"
+            ),
         }
         return None
 
