@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local environment variables (API keys)
+.env
+
+# Playwright MCP debug artifacts
+.playwright-mcp/
+/*.png
+
+# Symlinks into .venv created by Streamlit's skill installer
+.agents/skills/developing-with-streamlit
+.claude/skills/developing-with-streamlit
