@@ -87,7 +87,19 @@ def get_client():
     if not base_url or not model:
         return None, None
     api_key = os.environ.get("LLM_API_KEY", "placeholder")
-    return OpenAI(base_url=base_url, api_key=api_key), model
+
+    # If the backend sits behind Cloudflare Access (e.g. the ollama-homelab
+    # tunnel), a service token's two headers must ride along on every call.
+    cf_client_id = os.environ.get("CF_ACCESS_CLIENT_ID")
+    cf_client_secret = os.environ.get("CF_ACCESS_CLIENT_SECRET")
+    default_headers = None
+    if cf_client_id and cf_client_secret:
+        default_headers = {
+            "CF-Access-Client-Id": cf_client_id,
+            "CF-Access-Client-Secret": cf_client_secret,
+        }
+
+    return OpenAI(base_url=base_url, api_key=api_key, default_headers=default_headers), model
 
 
 def send_chat_message(client, model, user_text):
