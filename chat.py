@@ -114,6 +114,18 @@ def send_chat_message(client, model, user_text):
         st.session_state["last_debug"] = {"reasoning": None, "tool_calls_raw": [], "error": str(exc)}
         return None
 
+    if not hasattr(response, "choices"):
+        # A non-JSON response (e.g. an HTML page from an auth gate blocking
+        # the request) isn't raised as an error by the OpenAI SDK — it's
+        # returned as a plain string instead. Treat it as a backend failure.
+        snippet = str(response)[:200]
+        st.session_state["last_debug"] = {
+            "reasoning": None,
+            "tool_calls_raw": [],
+            "error": f"Backend returned a non-API response, likely blocked upstream: {snippet!r}",
+        }
+        return None
+
     message = response.choices[0].message
     st.session_state["last_debug"] = {
         "reasoning": getattr(message, "reasoning", None),
